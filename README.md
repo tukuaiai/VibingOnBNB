@@ -49,6 +49,39 @@ VibingOnBNB/
 
 ---
 
+## 🏗️ Architecture (Mermaid)
+
+```mermaid
+flowchart TB
+  subgraph AEON[AEON — AI‑Native Payments & Agents]
+    Agent[AI Agent\nagent-pay.mjs] -->|signs payment| Facilitator[Facilitator API\n:3402]
+    Agent -->|402 → settle| PaidAPI[Paid API\n:8601]
+    Facilitator -->|verify / settle| BSC[BSC Testnet]
+    PaidAPI -->|verify + receipt| BSC
+    PaidAPI --> Response[Paid Response\n(200)]
+  end
+
+  subgraph INFINIT[INFINIT — Prompt‑to‑DeFi]
+    UI[Smart Action UI\nVite :5173] --> Strategy[Strategy Builder\n/ palette]
+    Strategy --> Save[LocalStorage\nSave/Share/Replay]
+  end
+
+  subgraph UNIBASE[Unibase — Long‑Term Memory]
+    MCP[MCP Server\n:8900] --> MemoryAPI[Memory API\n:8901]
+    MemoryAPI --> State[Local State\nmemory_state.json]
+    MemoryAPI --> Membase[Unibase Membase\n(Cloud / Hub)]
+  end
+
+  classDef svc fill:#0b1220,stroke:#4f46e5,color:#e5e7eb;
+  classDef api fill:#111827,stroke:#22c55e,color:#e5e7eb;
+  classDef ext fill:#111827,stroke:#f59e0b,color:#e5e7eb;
+  class Facilitator,PaidAPI,MemoryAPI api;
+  class UI,Agent,MCP svc;
+  class BSC,Membase ext;
+```
+
+---
+
 ## ✅ 运行前置要求
 
 - **Node.js 18+ / npm**
