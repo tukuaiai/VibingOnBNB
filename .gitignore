@@ -1,0 +1,12 @@
+**/node_modules/
+**/.env*
+ctrl-shift-projects/_logs/
+**/__pycache__/
+**/*.pyc
+**/.mypy_cache/
+**/.pytest_cache/
+**/.vite/
+**/dist/
+**/build/
+.DS_Store
+.env-private

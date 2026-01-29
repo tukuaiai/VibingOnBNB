@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Arena - Get Reward Tokens</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .info-row span:first-child {
+            color: #666;
+        }
+
+        .info-row span:last-child {
+            color: #333;
+            font-weight: 600;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 12px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .status-info {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-success {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .status-error {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .step {
+            padding: 10px;
+            border-left: 3px solid #667eea;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .step.active {
+            background: #f0f4ff;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .step.completed {
+            color: #4caf50;
+            border-left-color: #4caf50;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .link:hover {
+            text-decoration: underline;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .wallet-display {
+            background: #f5f5f5;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 15px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Agent Arena</h1>
+        <div class="subtitle">Pay 1 USD1, Get Service <span class="badge">0 GAS</span></div>
+
+        <!-- Wallet Connection -->
+        <div id="connectSection">
+            <button class="btn-primary" onclick="connectWallet()">
+                Connect MetaMask
+            </button>
+        </div>
+
+        <!-- Main App -->
+        <div id="appSection" class="hidden">
+            <div class="wallet-display">
+                <strong>Your Wallet:</strong> <span id="walletAddress"></span>
+            </div>
+
+            <div class="card">
+                <h3>Your Balances</h3>
+                <div class="info-row">
+                    <span>USD1 Balance</span>
+                    <span id="usd1Balance">Loading...</span>
+                </div>
+                <div class="info-row">
+                    <span>AART Balance</span>
+                    <span id="aartBalance">Loading...</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Get Reward Tokens</h3>
+                <div class="info-row">
+                    <span>You Pay</span>
+                    <span>1 USD1</span>
+                </div>
+                <div class="info-row">
+                    <span>You Get</span>
+                    <span>100 AART</span>
+                </div>
+                <div class="info-row">
+                    <span>Gas Fee</span>
+                    <span style="color: #4caf50;">FREE! 🎉</span>
+                </div>
+            </div>
+
+            <!-- Status -->
+            <div id="statusSection"></div>
+
+            <!-- Steps -->
+            <div id="stepsSection" class="hidden">
+                <div class="step" id="step1">1. Approving USD1...</div>
+                <div class="step" id="step2">2. Signing payment (0 gas)...</div>
+                <div class="step" id="step3">3. Settling payment...</div>
+                <div class="step" id="step4">4. Minting rewards...</div>
+                <div class="step" id="step5">5. Complete!</div>
+            </div>
+
+            <!-- Action Button -->
+            <button class="btn-primary" id="payButton" onclick="payAndGetTokens()">
+                Pay 1 USD1
+            </button>
+
+            <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #999;">
+                BSC Mainnet - USD1 Payments
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CONFIG = {
+            rpc: 'https://bsc-dataseed.binance.org',
+            chainId: 56,
+            usd1: '0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d',
+            relayer: '0xE1C2830d5DDd6B49E9c46EbE03a98Cb44CD8eA5a',
+            rewarderWallet: '0xa23beff60ad1b91f35e91476475f9e3eba0897d7',
+            facilitatorUrl: 'http://localhost:3000'
+        };
+
+        let provider, signer, userAddress;
+
+        async function connectWallet() {
+            try {
+                if (!window.ethereum) {
+                    alert('Please install MetaMask!');
+                    return;
+                }
+
+                provider = new ethers.BrowserProvider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                signer = await provider.getSigner();
+                userAddress = await signer.getAddress();
+
+                // Switch to BSC Mainnet
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x38' }], // 56 in hex
+                    });
+                } catch (switchError) {
+                    // Chain not added, add it
+                    await window.ethereum.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [{
+                            chainId: '0x61',
+                            chainName: 'BSC Testnet',
+                            nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+                            rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545'],
+                            blockExplorerUrls: ['https://testnet.bscscan.com']
+                        }]
+                    });
+                }
+
+                document.getElementById('connectSection').classList.add('hidden');
+                document.getElementById('appSection').classList.remove('hidden');
+                document.getElementById('walletAddress').textContent = userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+
+                await loadBalances();
+            } catch (error) {
+                showStatus('Error connecting wallet: ' + error.message, 'error');
+            }
+        }
+
+        async function loadBalances() {
+            const usd1Contract = new ethers.Contract(CONFIG.usd1, [
+                'function balanceOf(address) view returns (uint256)',
+                'function decimals() view returns (uint8)'
+            ], provider);
+
+            const usd1Balance = await usd1Contract.balanceOf(userAddress);
+
+            document.getElementById('usd1Balance').textContent = ethers.formatUnits(usd1Balance, 18) + ' USD1';
+            document.getElementById('aartBalance').textContent = 'N/A';
+        }
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('statusSection');
+            statusDiv.innerHTML = `<div class="status status-${type}">${message}</div>`;
+        }
+
+        function updateStep(stepNum, state) {
+            const step = document.getElementById(`step${stepNum}`);
+            if (state === 'active') {
+                step.classList.add('active');
+            } else if (state === 'completed') {
+                step.classList.remove('active');
+                step.classList.add('completed');
+            }
+        }
+
+        async function payAndGetTokens() {
+            const button = document.getElementById('payButton');
+            button.disabled = true;
+            document.getElementById('stepsSection').classList.remove('hidden');
+
+            try {
+                // Step 1: Approve USDT
+                updateStep(1, 'active');
+                showStatus('Approving USD1 to relayer...', 'info');
+
+                const usdtContract = new ethers.Contract(CONFIG.usd1, [
+                    'function approve(address,uint256) returns (bool)',
+                    'function allowance(address,address) view returns (uint256)'
+                ], signer);
+
+                const allowance = await usdtContract.allowance(userAddress, CONFIG.relayer);
+                const amount = ethers.parseUnits('1', 18);
+
+                if (allowance < amount) {
+                    const approveTx = await usdtContract.approve(CONFIG.relayer, ethers.parseUnits('100', 18));
+                    await approveTx.wait();
+                }
+                updateStep(1, 'completed');
+
+                // Step 2: Sign payment (0 gas!)
+                updateStep(2, 'active');
+                showStatus('Sign the payment message (0 gas!)', 'info');
+
+                const nonce = ethers.hexlify(ethers.randomBytes(32));
+                const validAfter = Math.floor(Date.now() / 1000);
+                const validBefore = validAfter + 600;
+
+                const domain = {
+                    name: 'B402',
+                    version: '1',
+                    chainId: CONFIG.chainId,
+                    verifyingContract: CONFIG.relayer
+                };
+
+                const types = {
+                    TransferWithAuthorization: [
+                        { name: 'from', type: 'address' },
+                        { name: 'to', type: 'address' },
+                        { name: 'value', type: 'uint256' },
+                        { name: 'validAfter', type: 'uint256' },
+                        { name: 'validBefore', type: 'uint256' },
+                        { name: 'nonce', type: 'bytes32' }
+                    ]
+                };
+
+                const value = {
+                    from: userAddress,
+                    to: CONFIG.rewarderWallet,
+                    value: amount.toString(),
+                    validAfter,
+                    validBefore,
+                    nonce
+                };
+
+                const signature = await signer.signTypedData(domain, types, value);
+                updateStep(2, 'completed');
+
+                // Step 3: Submit to backend
+                updateStep(3, 'active');
+                showStatus('Settling payment on BSC...', 'info');
+
+                const response = await fetch('http://localhost:3000/process-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        authorization: value,
+                        signature,
+                        userAddress
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(result.error);
+                }
+
+                updateStep(3, 'completed');
+                updateStep(4, 'completed');
+                updateStep(5, 'completed');
+
+                showStatus(
+                    `✅ Success! Payment sent to rewarder wallet!
+                    <br><a class="link" href="https://bscscan.com/tx/${result.paymentTx}" target="_blank">View Transaction on BSCScan</a>`,
+                    'success'
+                );
+
+                // Reload balances
+                setTimeout(loadBalances, 2000);
+
+            } catch (error) {
+                showStatus('❌ Error: ' + error.message, 'error');
+            } finally {
+                button.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

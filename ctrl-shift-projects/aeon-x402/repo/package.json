@@ -1,0 +1,49 @@
+{
+  "name": "b402-sdk",
+  "version": "1.0.0",
+  "description": "Accept crypto payments with zero gas fees on BSC - USD1, USDT, USDC",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build",
+    "paid-api": "node scripts/paid-api.mjs",
+    "agent-pay": "node scripts/agent-pay.mjs"
+  },
+  "keywords": [
+    "b402",
+    "payments",
+    "bsc",
+    "binance-smart-chain",
+    "usd1",
+    "usdt",
+    "usdc",
+    "meta-transactions",
+    "eip-712"
+  ],
+  "author": "Vistara Labs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vistaralabs/b402-protocol"
+  },
+  "homepage": "https://b402.ai",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "ethers": "^6.15.0",
+    "https-proxy-agent": "^7.0.4",
+    "undici": "^6.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

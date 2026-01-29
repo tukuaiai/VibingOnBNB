@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B402 - Send USDT with ZERO Gas Fees!</title>
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .highlight {
+            background: #fef6e4;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .highlight strong {
+            color: #f59e0b;
+            font-size: 18px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .status.success {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+            color: #065f46;
+            display: block;
+        }
+
+        .status.error {
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+            color: #991b1b;
+            display: block;
+        }
+
+        .status.info {
+            background: #dbeafe;
+            border: 2px solid #3b82f6;
+            color: #1e40af;
+            display: block;
+        }
+
+        .loading {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .tx-link {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            word-break: break-all;
+        }
+
+        .tx-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .steps {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .steps h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .step {
+            display: flex;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .wallet-info {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .wallet-info.show {
+            display: block;
+        }
+
+        .balance {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 B402 Payment</h1>
+        <p class="subtitle">Send USDT on BSC Mainnet with ZERO gas fees!</p>
+
+        <div class="highlight">
+            <strong>💰 Pay $0 in gas!</strong><br>
+            <small>Our facilitator covers all transaction fees for you.</small>
+        </div>
+
+        <div id="walletInfo" class="wallet-info">
+            <div class="balance">
+                <span>Your Address:</span>
+                <span id="userAddress">Not connected</span>
+            </div>
+            <div class="balance">
+                <span>USDT Balance:</span>
+                <span id="usdtBalance">0</span>
+            </div>
+            <div class="balance">
+                <span>BNB Balance:</span>
+                <span id="bnbBalance">0</span>
+            </div>
+        </div>
+
+        <div class="steps">
+            <h3>How it works:</h3>
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <strong>Connect Wallet</strong><br>
+                    <small>Click button below to connect MetaMask</small>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <strong>Approve Once</strong><br>
+                    <small>One-time setup (~$0.10 in gas)</small>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <strong>Send for FREE</strong><br>
+                    <small>All future payments are gasless!</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="recipientAddress">Recipient Address</label>
+            <input type="text" id="recipientAddress" placeholder="0x..." />
+        </div>
+
+        <div class="input-group">
+            <label for="amount">Amount (USDT)</label>
+            <input type="number" id="amount" placeholder="0.1" step="0.01" min="0.01" />
+        </div>
+
+        <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+        <button id="approveBtn" onclick="approveRelayer()" style="display:none;">Step 1: Approve Relayer</button>
+        <button id="sendBtn" onclick="sendPayment()" style="display:none;">Step 2: Send Payment (FREE!)</button>
+
+        <div id="status" class="status"></div>
+        <div id="loading" class="loading" style="display:none;">
+            <div class="spinner"></div>
+            <p>Processing transaction...</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - MAINNET
+        const FACILITATOR_URL = 'http://localhost:3402'; // Change this after Railway deployment!
+        const RELAYER_CONTRACT = '0xE1C2830d5DDd6B49E9c46EbE03a98Cb44CD8eA5a';
+        const USDT_ADDRESS = '0x55d398326f99059fF775485246999027B3197955';
+        const CHAIN_ID = 56; // BSC Mainnet
+
+        const USDT_ABI = [
+            'function approve(address spender, uint256 amount) returns (bool)',
+            'function allowance(address owner, address spender) view returns (uint256)',
+            'function balanceOf(address account) view returns (uint256)',
+            'function decimals() view returns (uint8)'
+        ];
+
+        let provider, signer, userAddress, usdtContract;
+
+        async function connectWallet() {
+            try {
+                if (typeof window.ethereum === 'undefined') {
+                    showStatus('Please install MetaMask!', 'error');
+                    return;
+                }
+
+                showLoading(true);
+                showStatus('Connecting to MetaMask...', 'info');
+
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                signer = provider.getSigner();
+                userAddress = await signer.getAddress();
+
+                // Check if on BSC Mainnet
+                const network = await provider.getNetwork();
+                if (network.chainId !== CHAIN_ID) {
+                    showStatus('Please switch to BSC Mainnet in MetaMask!', 'error');
+                    showLoading(false);
+                    return;
+                }
+
+                // Initialize USDT contract
+                usdtContract = new ethers.Contract(USDT_ADDRESS, USDT_ABI, signer);
+
+                // Get balances
+                const usdtBalance = await usdtContract.balanceOf(userAddress);
+                const bnbBalance = await provider.getBalance(userAddress);
+                const usdtDecimals = await usdtContract.decimals();
+
+                // Update UI
+                document.getElementById('userAddress').textContent =
+                    userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+                document.getElementById('usdtBalance').textContent =
+                    ethers.utils.formatUnits(usdtBalance, usdtDecimals) + ' USDT';
+                document.getElementById('bnbBalance').textContent =
+                    ethers.utils.formatEther(bnbBalance) + ' BNB';
+
+                document.getElementById('walletInfo').classList.add('show');
+                document.getElementById('connectBtn').style.display = 'none';
+                document.getElementById('approveBtn').style.display = 'block';
+
+                showStatus('✅ Wallet connected! Now approve the relayer contract.', 'success');
+                showLoading(false);
+
+                // Check if already approved
+                checkApproval();
+
+            } catch (error) {
+                console.error(error);
+                showStatus('Connection failed: ' + error.message, 'error');
+                showLoading(false);
+            }
+        }
+
+        async function checkApproval() {
+            try {
+                const allowance = await usdtContract.allowance(userAddress, RELAYER_CONTRACT);
+                if (allowance.gt(ethers.utils.parseUnits('100', 6))) {
+                    document.getElementById('approveBtn').style.display = 'none';
+                    document.getElementById('sendBtn').style.display = 'block';
+                    showStatus('✅ Already approved! Ready to send gasless payments.', 'success');
+                }
+            } catch (error) {
+                console.error('Check approval error:', error);
+            }
+        }
+
+        async function approveRelayer() {
+            try {
+                showLoading(true);
+                showStatus('⏳ Approving relayer... (This will cost ~$0.10 in gas)', 'info');
+
+                const tx = await usdtContract.approve(
+                    RELAYER_CONTRACT,
+                    ethers.utils.parseUnits('1000000', 18) // 1M USDT
+                );
+
+                showStatus('Transaction sent! Waiting for confirmation...', 'info');
+                await tx.wait();
+
+                document.getElementById('approveBtn').style.display = 'none';
+                document.getElementById('sendBtn').style.display = 'block';
+
+                showStatus('✅ Approved! Now you can send USDT for FREE (no gas!)', 'success');
+                showLoading(false);
+
+            } catch (error) {
+                console.error(error);
+                showStatus('Approval failed: ' + error.message, 'error');
+                showLoading(false);
+            }
+        }
+
+        async function sendPayment() {
+            try {
+                const recipient = document.getElementById('recipientAddress').value;
+                const amount = document.getElementById('amount').value;
+
+                if (!ethers.utils.isAddress(recipient)) {
+                    showStatus('Invalid recipient address!', 'error');
+                    return;
+                }
+
+                if (!amount || parseFloat(amount) <= 0) {
+                    showStatus('Invalid amount!', 'error');
+                    return;
+                }
+
+                showLoading(true);
+                showStatus('⏳ Step 1/3: Signing payment authorization (no gas!)...', 'info');
+
+                const usdtDecimals = await usdtContract.decimals();
+                const value = ethers.utils.parseUnits(amount, usdtDecimals);
+                const now = Math.floor(Date.now() / 1000);
+
+                const authorization = {
+                    from: userAddress,
+                    to: recipient,
+                    value: value.toString(),
+                    validAfter: now - 60,
+                    validBefore: now + 3600,
+                    nonce: ethers.utils.hexlify(ethers.utils.randomBytes(32))
+                };
+
+                const domain = {
+                    name: 'B402',
+                    version: '1',
+                    chainId: CHAIN_ID,
+                    verifyingContract: RELAYER_CONTRACT
+                };
+
+                const types = {
+                    TransferWithAuthorization: [
+                        { name: 'from', type: 'address' },
+                        { name: 'to', type: 'address' },
+                        { name: 'value', type: 'uint256' },
+                        { name: 'validAfter', type: 'uint256' },
+                        { name: 'validBefore', type: 'uint256' },
+                        { name: 'nonce', type: 'bytes32' }
+                    ]
+                };
+
+                const signature = await signer._signTypedData(domain, types, authorization);
+
+                showStatus('⏳ Step 2/3: Verifying payment with facilitator...', 'info');
+
+                const payload = {
+                    paymentPayload: {
+                        token: USDT_ADDRESS,
+                        payload: { authorization, signature }
+                    },
+                    paymentRequirements: {
+                        relayerContract: RELAYER_CONTRACT,
+                        network: 'bsc'
+                    }
+                };
+
+                const verifyResponse = await fetch(`${FACILITATOR_URL}/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const verifyResult = await verifyResponse.json();
+
+                if (!verifyResult.isValid) {
+                    showStatus('❌ Verification failed: ' + verifyResult.invalidReason, 'error');
+                    showLoading(false);
+                    return;
+                }
+
+                showStatus('⏳ Step 3/3: Executing payment on-chain (facilitator pays gas!)...', 'info');
+
+                const settleResponse = await fetch(`${FACILITATOR_URL}/settle`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const settleResult = await settleResponse.json();
+
+                if (!settleResult.success) {
+                    showStatus('❌ Settlement failed: ' + settleResult.errorReason, 'error');
+                    showLoading(false);
+                    return;
+                }
+
+                const statusDiv = document.getElementById('status');
+                statusDiv.innerHTML = `
+                    <strong>🎉 Payment Successful!</strong><br>
+                    Sent ${amount} USDT to ${recipient.slice(0, 6)}...${recipient.slice(-4)}<br>
+                    <strong>You paid $0 in gas!</strong>
+                    <div class="tx-link">
+                        <a href="https://bscscan.com/tx/${settleResult.transaction}" target="_blank">
+                            View on BSCScan ↗
+                        </a>
+                    </div>
+                `;
+                statusDiv.className = 'status success';
+                showLoading(false);
+
+                // Clear inputs
+                document.getElementById('recipientAddress').value = '';
+                document.getElementById('amount').value = '';
+
+                // Refresh balances
+                setTimeout(() => {
+                    connectWallet();
+                }, 3000);
+
+            } catch (error) {
+                console.error(error);
+                showStatus('Payment failed: ' + error.message, 'error');
+                showLoading(false);
+            }
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        // Auto-connect if previously connected
+        window.addEventListener('load', () => {
+            if (window.ethereum && window.ethereum.selectedAddress) {
+                connectWallet();
+            }
+        });
+    </script>
+</body>
+</html>

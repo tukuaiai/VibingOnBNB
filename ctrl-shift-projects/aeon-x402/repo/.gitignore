@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+*/node_modules/
+**/ node_modules/
+
+# Environment files (CONTAINS SECRETS!)
+.env
+.env.local
+.env.*.local
+**/.env
+b402-facilitator/.env
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Deployment artifacts with addresses
+*-deployment.json
+deployment-*.json
+
+# Logs
+*.log
+logs/
+/tmp/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+.claude/
+
+# Test artifacts
+coverage/
+.nyc_output/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# OS files
+Thumbs.db
+
+# Documentation with private keys (DO NOT COMMIT)
+MAINNET_DEPLOYMENT.md
+SUCCESS.md
+DEPLOYMENT_READY.md
+TESTING_INSTRUCTIONS.md
+b402-facilitator/RAILWAY_DEPLOY.md
+PRODUCTION_FIXES.md
+MAINNET_DEPLOYMENT_COMPLETE.md
+GIT_COMMIT_GUIDE.md
+
+# Private keys
+*.key
+*.pem
