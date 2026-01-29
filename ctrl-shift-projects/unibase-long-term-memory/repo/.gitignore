@@ -46,3 +46,4 @@ Thumbs.db
 chroma_db/
 
 out/
+memory_state.json

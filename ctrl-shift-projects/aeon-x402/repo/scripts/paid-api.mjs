@@ -120,12 +120,16 @@ const server = http.createServer(async (req, res) => {
       }
 
       const verifyResult = await verifyPayment(paymentPayload, paymentRequirements);
+      const invalidReason = verifyResult?.invalidReason || 'unknown';
       if (!verifyResult?.isValid) {
-        return json(res, 402, {
-          error: 'payment invalid',
-          reason: verifyResult?.invalidReason || 'unknown',
-          facilitator: FACILITATOR_URL
-        });
+        // Allow "Nonce already used" only when a settleTx is provided and confirmed.
+        if (!settleTx || invalidReason !== 'Nonce already used') {
+          return json(res, 402, {
+            error: 'payment invalid',
+            reason: invalidReason,
+            facilitator: FACILITATOR_URL
+          });
+        }
       }
 
       if (!settleTx) {
