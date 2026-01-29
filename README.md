@@ -54,22 +54,22 @@ VibingOnBNB/
 ```mermaid
 flowchart TB
   subgraph AEON[AEON - AI Native Payments & Agents]
-    Agent[AI Agent\\nagent-pay.mjs] -->|sign payment| Facilitator[Facilitator API\\n:3402]
-    Agent -->|402 -> settle| PaidAPI[Paid API\\n:8601]
+    Agent["AI Agent<br/>agent-pay.mjs"] -->|sign payment| Facilitator["Facilitator API<br/>:3402"]
+    Agent -->|402 then settle| PaidAPI["Paid API<br/>:8601"]
     Facilitator -->|verify / settle| BSC[BSC Testnet]
     PaidAPI -->|verify + receipt| BSC
-    PaidAPI --> Response[Paid Response\\n(200)]
+    PaidAPI --> Response["Paid Response<br/>200"]
   end
 
   subgraph INFINIT[INFINIT - Prompt-to-DeFi]
-    UI[Smart Action UI\\nVite :5173] --> Strategy[Strategy Builder\\n/ palette]
-    Strategy --> Save[LocalStorage\\nSave/Share/Replay]
+    UI["Smart Action UI<br/>Vite :5173"] --> Strategy["Strategy Builder<br/>/ palette"]
+    Strategy --> Save["LocalStorage<br/>Save/Share/Replay"]
   end
 
   subgraph UNIBASE[Unibase - Long-Term Memory]
-    MCP[MCP Server\\n:8900] --> MemoryAPI[Memory API\\n:8901]
-    MemoryAPI --> State[Local State\\nmemory_state.json]
-    MemoryAPI --> Membase[Unibase Membase\\nCloud/Hub]
+    MCP["MCP Server<br/>:8900"] --> MemoryAPI["Memory API<br/>:8901"]
+    MemoryAPI --> State["Local State<br/>memory_state.json"]
+    MemoryAPI --> Membase["Unibase Membase<br/>Cloud/Hub"]
   end
 ```
 
